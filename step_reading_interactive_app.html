@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>التدريب على نماذج محاكية لإختبار ستيب</title>
+  <style>
+    :root {
+      --bg1:#071526;
+      --bg2:#103b4d;
+      --glass:rgba(255,255,255,.12);
+      --glass2:rgba(255,255,255,.18);
+      --line:rgba(255,255,255,.22);
+      --text:#f7fbff;
+      --muted:#d6e7ef;
+      --gold:#f4d37a;
+      --green:#a9e8c3;
+      --red:#ffb4b4;
+      --dark:#0c1724;
+      --white:#ffffff;
+      --shadow: 0 24px 70px rgba(0,0,0,.32);
+      --radius: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Tahoma", "Arial", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(244,211,122,.25), transparent 28%),
+        radial-gradient(circle at 80% 20%, rgba(123,213,255,.18), transparent 25%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x: hidden;
+    }
+
+    .bg-orb {
+      position: fixed;
+      border-radius: 999px;
+      filter: blur(10px);
+      opacity: .35;
+      pointer-events: none;
+      animation: float 9s ease-in-out infinite alternate;
+    }
+
+    .orb1 {
+      width: 260px;
+      height: 260px;
+      background: #f4d37a;
+      bottom: -80px;
+      right: -70px;
+    }
+
+    .orb2 {
+      width: 190px;
+      height: 190px;
+      background: #72e3ff;
+      top: 110px;
+      left: -60px;
+      animation-delay: 1s;
+    }
+
+    @keyframes float {
+      from { transform: translateY(0) translateX(0); }
+      to { transform: translateY(-28px) translateX(20px); }
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 30px 0 38px;
+    }
+
+    header {
+      position: relative;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: 22px;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent);
+      transform: translateX(100%);
+      animation: shine 5s infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(100%); }
+      45%, 100% { transform: translateX(-100%); }
+    }
+
+    .brand {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(145deg, rgba(244,211,122,.95), rgba(255,255,255,.25)),
+        linear-gradient(135deg, #fff, #cdefff);
+      color: #143047;
+      box-shadow: 0 14px 35px rgba(0,0,0,.23), inset 0 0 18px rgba(255,255,255,.65);
+      border: 1px solid rgba(255,255,255,.5);
+      font-weight: 900;
+      font-size: 22px;
+      flex: 0 0 auto;
+    }
+
+    .title-wrap {
+      flex: 1;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(27px, 4.3vw, 47px);
+      line-height: 1.35;
+      letter-spacing: -.5px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(244,211,122,.18);
+      border: 1px solid rgba(244,211,122,.35);
+      color: #fff3c4;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.07));
+      backdrop-filter: blur(14px);
+      box-shadow: 0 16px 44px rgba(0,0,0,.2);
+    }
+
+    .side {
+      padding: 16px;
+      align-self: start;
+      position: sticky;
+      top: 14px;
+    }
+
+    .side h2, .card h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+
+    .model-btn {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.19);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      padding: 14px;
+      border-radius: 18px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      text-align: right;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .model-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.14);
+    }
+
+    .model-btn.active {
+      background: linear-gradient(145deg, rgba(244,211,122,.32), rgba(169,232,195,.17));
+      border-color: rgba(244,211,122,.55);
+    }
+
+    .model-btn span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 5px;
+      direction: ltr;
+      text-align: right;
+    }
+
+    .tools {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button, select {
+      font-family: inherit;
+    }
+
+    .tool-btn {
+      border: 0;
+      color: #082033;
+      background: linear-gradient(145deg, #fff4c8, #f4d37a);
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .2s ease, filter .2s ease;
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+    }
+
+    .tool-btn.secondary {
+      color: var(--text);
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.20);
+      box-shadow: none;
+    }
+
+    .tool-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.03);
+    }
+
+    .tool-btn:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .content {
+      display: grid;
+      gap: 18px;
+    }
+
+    .card {
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .hero-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .hero-card h2 {
+      margin: 0 0 8px;
+      font-size: clamp(23px, 3vw, 34px);
+    }
+
+    .hero-card .en-title {
+      direction: ltr;
+      text-align: right;
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .progress-wrap {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--gold) var(--progress, 0deg), rgba(255,255,255,.16) 0deg);
+      padding: 11px;
+      flex: 0 0 auto;
+    }
+
+    .progress-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(7,21,38,.82);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .progress-inner strong {
+      font-size: 32px;
+      color: var(--gold);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      border: 1px solid rgba(255,255,255,.20);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: rgba(244,211,122,.25);
+      border-color: rgba(244,211,122,.55);
+      color: #fff8d7;
+    }
+
+    .text-box {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+      line-height: 2;
+      white-space: pre-wrap;
+    }
+
+    .english {
+      direction: ltr;
+      text-align: left;
+      font-size: 18px;
+      line-height: 1.85;
+      color: #f9fcff;
+    }
+
+    .arabic {
+      direction: rtl;
+      text-align: right;
+      font-size: 17px;
+      color: #f7fbff;
+    }
+
+    .reader-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .reader-controls select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 14px;
+      background: rgba(255,255,255,.10);
+      color: var(--text);
+      padding: 10px;
+      outline: none;
+    }
+
+    .reader-controls option {
+      color: #111;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      margin-top: 10px;
+    }
+
+    .question {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      margin-bottom: 14px;
+    }
+
+    .question h3 {
+      margin: 0 0 12px;
+      direction: ltr;
+      text-align: left;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .option {
+      direction: ltr;
+      text-align: left;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      margin: 8px 0;
+      cursor: pointer;
+      transition: .18s ease;
+      font-size: 15px;
+    }
+
+    .option:hover {
+      background: rgba(255,255,255,.12);
+    }
+
+    .option input {
+      margin-top: 4px;
+    }
+
+    .option.correct {
+      border-color: rgba(169,232,195,.75);
+      background: rgba(169,232,195,.18);
+    }
+
+    .option.wrong {
+      border-color: rgba(255,180,180,.75);
+      background: rgba(255,180,180,.17);
+    }
+
+    .explain {
+      display: none;
+      margin-top: 10px;
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: rgba(244,211,122,.13);
+      border: 1px solid rgba(244,211,122,.27);
+      color: #fff4c8;
+      line-height: 1.7;
+    }
+
+    .result {
+      display: none;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(169,232,195,.16);
+      border: 1px solid rgba(169,232,195,.36);
+      margin-top: 14px;
+      line-height: 1.8;
+      font-size: 18px;
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 20px;
+      padding: 16px;
+      font-size: 14px;
+    }
+
+    .mini {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 4px 4px 0;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      color: var(--muted);
+      font-size: 13px;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .side {
+        position: relative;
+        top: 0;
+      }
+      .hero-card {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .progress-wrap {
+        width: 140px;
+        height: 140px;
+        align-self: center;
+      }
+      .reader-controls {
+        grid-template-columns: 1fr 1fr;
+      }
+      .brand {
+        align-items: flex-start;
+      }
+      .badge {
+        display: none;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #111;
+      }
+      .side, .reader-controls, .tabs, .tool-btn, .bg-orb {
+        display: none !important;
+      }
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      header, .panel, .text-box, .question {
+        background: #fff !important;
+        color: #111 !important;
+        box-shadow: none !important;
+        border-color: #ddd !important;
+      }
+      .english, .arabic, .question h3, .option {
+        color: #111 !important;
+      }
+      .option {
+        background: #fff !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orb orb1"></div>
+  <div class="bg-orb orb2"></div>
+
+  <main class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">STEP</div>
+        <div class="title-wrap">
+          <h1>التدريب على نماذج محاكية لإختبار ستيب</h1>
+          <p class="subtitle">قطع قراءة تدريبية مع ترجمة عربية، قراءة صوتية شاملة باللغة الإنجليزية، وأسئلة تفاعلية بتصحيح فوري.</p>
+          <div class="mini">قراءة إنجليزية</div>
+          <div class="mini">ترجمة عربية</div>
+          <div class="mini">أسئلة اختيار من متعدد</div>
+          <div class="mini">تصحيح ونتيجة</div>
+        </div>
+        <div class="badge">نماذج تدريبية وليست أسئلة فعلية</div>
+      </div>
+    </header>
+
+    <section class="layout">
+      <aside class="panel side">
+        <h2>اختر القطعة</h2>
+        <div id="modelButtons"></div>
+
+        <div class="tools">
+          <button class="tool-btn" onclick="speakPassage()">🔊 قراءة القطعة كاملة</button>
+          <button class="tool-btn secondary" onclick="pauseSpeech()">⏸️ إيقاف مؤقت</button>
+          <button class="tool-btn secondary" onclick="resumeSpeech()">▶️ متابعة</button>
+          <button class="tool-btn secondary" onclick="stopSpeech()">⏹️ إيقاف القراءة</button>
+          <button class="tool-btn secondary" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+        </div>
+        <p class="note">
+          ملاحظة: القراءة الصوتية تعمل من المتصفح باستخدام الأصوات المتوفرة في الجهاز. يفضل فتح التطبيق عبر Chrome أو Edge للحصول على أداء أفضل.
+        </p>
+      </aside>
+
+      <section class="content">
+        <div class="panel card hero-card">
+          <div>
+            <h2 id="currentTitleAr"></h2>
+            <div class="en-title" id="currentTitleEn"></div>
+            <p class="subtitle">اقرئي القطعة أولًا، ثم استمعي للنطق، وبعد ذلك انتقلي للأسئلة.</p>
+          </div>
+          <div class="progress-wrap" id="progressCircle">
+            <div class="progress-inner">
+              <div>
+                <strong id="scoreText">0%</strong>
+                <div>النتيجة</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel card">
+          <div class="tabs">
+            <button class="tab active" data-tab="passage" onclick="showTab('passage')">النص الإنجليزي</button>
+            <button class="tab" data-tab="translation" onclick="showTab('translation')">الترجمة العربية</button>
+            <button class="tab" data-tab="questions" onclick="showTab('questions')">الأسئلة</button>
+          </div>
+
+          <div id="passageTab">
+            <h2>Reading Passage</h2>
+            <div class="text-box english" id="passageText"></div>
+
+            <div class="reader-controls">
+              <button class="tool-btn" onclick="speakPassage()">🔊 قراءة شاملة</button>
+              <button class="tool-btn secondary" onclick="speakSelectedParagraph()">🔈 قراءة الفقرة المحددة</button>
+              <select id="rateSelect" title="سرعة القراءة">
+                <option value="0.75">سرعة بطيئة</option>
+                <option value="0.9" selected>سرعة مناسبة</option>
+                <option value="1">سرعة عادية</option>
+                <option value="1.15">سرعة أسرع</option>
+              </select>
+              <select id="voiceSelect" title="اختيار الصوت">
+                <option value="">الصوت الإنجليزي الافتراضي</option>
+              </select>
+            </div>
+            <p class="note">لتدريب أدق: شغّلي القراءة، ثم تابعي النص بعينيك، وبعدها أجيبي عن الأسئلة دون الرجوع للترجمة.</p>
+          </div>
+
+          <div id="translationTab" class="hidden">
+            <h2>الترجمة العربية</h2>
+            <div class="text-box arabic" id="translationText"></div>
+          </div>
+
+          <div id="questionsTab" class="hidden">
+            <h2>Questions</h2>
+            <div id="questionsBox"></div>
+            <button class="tool-btn" onclick="checkAnswers()">تصحيح الإجابات</button>
+            <button class="tool-btn secondary" onclick="resetAnswers()">إعادة المحاولة</button>
+            <div id="resultBox" class="result"></div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <div class="footer">
+      إعداد وتصميم: أ/ فاطمة هزازي – ملتقى التعليم التفاعلي
+      <br>
+      تنبيه: المحتوى تدريبي محاكي للنمط العام ولا يمثل أسئلة اختبار فعلية أو تسريبات.
+    </div>
+  </main>
+
+  <script>
+    const DATA = [
+  {
+    "id": "income",
+    "title_ar": "القطعة الأولى: الدخل والمجتمعات",
+    "title_en": "Income and Communities",
+    "passage": "In many societies, income affects the way people live, learn, and access services. Families with higher income often have better access to education, healthcare, and safe housing. They may also have more opportunities to travel, use technology, and develop new skills. On the other hand, families with lower income may face challenges such as limited access to quality schools, fewer job opportunities, and difficulty paying for basic needs.\n\nHowever, income is not the only factor that shapes a community. Cooperation, education, public services, and social support also play an important role. A community with strong relationships among its members can help people overcome many difficulties. When people support one another, share resources, and work together, the whole community becomes stronger.\n\nGovernments and organizations can help reduce income gaps by improving education, creating jobs, and providing health services. When these services are available to everyone, people have a better chance to improve their lives. Therefore, building a successful community depends not only on money, but also on fairness, cooperation, and equal opportunities.",
+    "translation": "في كثير من المجتمعات يؤثر الدخل في طريقة عيش الناس وتعلّمهم وحصولهم على الخدمات. فالأسر ذات الدخل الأعلى غالبًا تحصل على تعليم ورعاية صحية وسكن آمن بشكل أفضل، وقد تكون لديها فرص أكثر للسفر واستخدام التقنية وتطوير المهارات. أما الأسر ذات الدخل المنخفض فقد تواجه تحديات مثل ضعف الوصول إلى المدارس الجيدة، وقلة فرص العمل، وصعوبة توفير الاحتياجات الأساسية.\n\nلكن الدخل ليس العامل الوحيد الذي يصنع المجتمع. فالتعاون والتعليم والخدمات العامة والدعم الاجتماعي لها دور مهم أيضًا. فالمجتمع الذي تربط أفراده علاقات قوية يستطيع مساعدة الناس على تجاوز كثير من الصعوبات. وعندما يدعم الناس بعضهم بعضًا ويتشاركون الموارد ويعملون معًا، يصبح المجتمع أقوى.\n\nتستطيع الحكومات والمنظمات تقليل الفجوات في الدخل من خلال تحسين التعليم، وتوفير الوظائف، وتقديم الخدمات الصحية. وعندما تكون هذه الخدمات متاحة للجميع، يحصل الناس على فرصة أفضل لتحسين حياتهم. لذلك فإن بناء مجتمع ناجح لا يعتمد على المال فقط، بل يعتمد أيضًا على العدالة والتعاون وتكافؤ الفرص.",
+    "questions": [
+      {
+        "q": "What is the main idea of the passage?",
+        "options": [
+          "Money is the only important factor in life.",
+          "Income affects communities, but cooperation and services are also important.",
+          "Poor families do not need education.",
+          "Governments cannot help communities."
+        ],
+        "answer": 1,
+        "explain_ar": "الفكرة الرئيسة أن الدخل يؤثر في المجتمع، لكن التعاون والخدمات والفرص العادلة مهمة أيضًا."
+      },
+      {
+        "q": "Families with higher income often have better access to:",
+        "options": [
+          "unsafe housing",
+          "fewer services",
+          "education and healthcare",
+          "more problems"
+        ],
+        "answer": 2,
+        "explain_ar": "ذكرت القطعة أن الأسر ذات الدخل الأعلى تحصل غالبًا على تعليم ورعاية صحية وسكن آمن بشكل أفضل."
+      },
+      {
+        "q": "According to the passage, strong relationships in a community help people:",
+        "options": [
+          "ignore education",
+          "overcome difficulties",
+          "increase prices",
+          "avoid work"
+        ],
+        "answer": 1,
+        "explain_ar": "العلاقات القوية بين أفراد المجتمع تساعد الناس على تجاوز الصعوبات."
+      },
+      {
+        "q": "The word “reduce” is closest in meaning to:",
+        "options": [
+          "make less",
+          "make bigger",
+          "forget",
+          "refuse"
+        ],
+        "answer": 0,
+        "explain_ar": "كلمة reduce تعني يقلل أو يجعل الشيء أقل."
+      }
+    ]
+  },
+  {
+    "id": "pandas",
+    "title_ar": "القطعة الثانية: الباندا",
+    "title_en": "Pandas",
+    "passage": "Pandas are one of the most loved animals in the world. They are easily recognized by their black and white fur, round faces, and calm behavior. Pandas mainly live in the mountain forests of China, where bamboo grows in large amounts. Although pandas belong to the bear family, their diet is very different from many other bears. Most of their food is bamboo, and they may spend many hours each day eating it.\n\nOne reason pandas need to eat so much bamboo is that bamboo does not provide a lot of energy. As a result, pandas often move slowly and rest for long periods. Baby pandas are very small when they are born, and they need great care from their mothers. Because pandas reproduce slowly, protecting them is very important.\n\nIn the past, pandas were endangered because of habitat loss and low birth rates. Many forests were cut down, which reduced the places where pandas could live and find food. Today, conservation programs have helped protect pandas by creating reserves and supporting breeding centers. These efforts have improved the situation, but pandas still need protection to survive in the wild.",
+    "translation": "تُعد الباندا من أكثر الحيوانات المحبوبة في العالم. ويمكن تمييزها بسهولة من خلال فرائها الأسود والأبيض، ووجهها المستدير، وسلوكها الهادئ. تعيش الباندا غالبًا في الغابات الجبلية في الصين حيث ينمو الخيزران بكميات كبيرة. ورغم أن الباندا تنتمي إلى فصيلة الدببة، فإن غذاءها يختلف عن غذاء كثير من الدببة الأخرى. فمعظم طعامها من الخيزران، وقد تقضي ساعات طويلة يوميًا في أكله.\n\nأحد أسباب حاجة الباندا إلى أكل كمية كبيرة من الخيزران هو أن الخيزران لا يعطي طاقة كبيرة. لذلك تتحرك الباندا ببطء غالبًا وتستريح لفترات طويلة. وصغار الباندا تكون صغيرة جدًا عند الولادة وتحتاج إلى رعاية كبيرة من أمهاتها. وبما أن الباندا تتكاثر ببطء، فإن حمايتها أمر مهم جدًا.\n\nفي الماضي كانت الباندا مهددة بالانقراض بسبب فقدان موطنها وانخفاض معدلات الولادة. فقد قُطعت كثير من الغابات، مما قلل الأماكن التي تستطيع الباندا العيش فيها والعثور على غذائها. أما اليوم فقد ساعدت برامج الحماية في الحفاظ على الباندا من خلال إنشاء المحميات ودعم مراكز التكاثر. وقد حسّنت هذه الجهود الوضع، لكن الباندا لا تزال بحاجة إلى الحماية لتعيش في البرية.",
+    "questions": [
+      {
+        "q": "Where do pandas mainly live?",
+        "options": [
+          "In African deserts",
+          "In mountain forests of China",
+          "In oceans",
+          "In cold polar areas"
+        ],
+        "answer": 1,
+        "explain_ar": "تعيش الباندا غالبًا في الغابات الجبلية في الصين."
+      },
+      {
+        "q": "Why do pandas eat a lot of bamboo?",
+        "options": [
+          "Bamboo gives little energy.",
+          "Bamboo is very rare.",
+          "Pandas dislike other food only.",
+          "Pandas never rest."
+        ],
+        "answer": 0,
+        "explain_ar": "لأن الخيزران لا يعطي طاقة كبيرة، لذلك تحتاج الباندا إلى أكله بكميات كبيرة."
+      },
+      {
+        "q": "Pandas were endangered mainly because of:",
+        "options": [
+          "too much bamboo",
+          "habitat loss and low birth rates",
+          "fast movement",
+          "living in groups"
+        ],
+        "answer": 1,
+        "explain_ar": "كانت مهددة بسبب فقدان الموطن وانخفاض معدلات الولادة."
+      },
+      {
+        "q": "The word “conservation” means:",
+        "options": [
+          "protection",
+          "travel",
+          "danger",
+          "hunting"
+        ],
+        "answer": 0,
+        "explain_ar": "كلمة conservation تعني الحماية أو المحافظة على الشيء."
+      }
+    ]
+  },
+  {
+    "id": "email",
+    "title_ar": "القطعة الثالثة: الإيميل والعميل",
+    "title_en": "Email and Customer Service",
+    "passage": "Email is one of the most common tools used in customer service. Many companies use email to answer questions, solve problems, and provide information about products or services. Customers often prefer email because they can write their problem clearly and attach documents or pictures if needed. Email also gives both the customer and the company a written record of the conversation.\n\nGood customer service emails should be polite, clear, and helpful. The employee should begin with a greeting, thank the customer for contacting the company, and explain the solution in simple language. If the problem cannot be solved immediately, the employee should tell the customer what steps will be taken next and when to expect a response.\n\nHowever, email communication can sometimes cause misunderstandings. Since the customer cannot hear the employee’s voice or see facial expressions, the message must be written carefully. A short or unclear reply may seem rude even if that was not the intention. For this reason, companies train their employees to write professional emails that show respect and understanding.",
+    "translation": "يُعد البريد الإلكتروني من أكثر الأدوات استخدامًا في خدمة العملاء. تستخدم كثير من الشركات البريد الإلكتروني للإجابة عن الأسئلة، وحل المشكلات، وتقديم المعلومات حول المنتجات أو الخدمات. ويفضل العملاء البريد الإلكتروني غالبًا لأنهم يستطيعون كتابة المشكلة بوضوح وإرفاق مستندات أو صور إذا احتاجوا إلى ذلك. كما يمنح البريد الإلكتروني كلًا من العميل والشركة سجلًا مكتوبًا للمحادثة.\n\nيجب أن تكون رسائل خدمة العملاء الجيدة مهذبة وواضحة ومفيدة. ينبغي للموظف أن يبدأ بتحية، ثم يشكر العميل على تواصله مع الشركة، ويشرح الحل بلغة بسيطة. وإذا لم يكن بالإمكان حل المشكلة مباشرة، فعلى الموظف أن يخبر العميل بالخطوات التالية ومتى يتوقع الرد.\n\nلكن التواصل عبر البريد الإلكتروني قد يسبب أحيانًا سوء فهم. فبما أن العميل لا يستطيع سماع صوت الموظف أو رؤية تعابير وجهه، يجب كتابة الرسالة بعناية. فالرد القصير أو غير الواضح قد يبدو غير مهذب حتى لو لم يكن هذا هو المقصود. ولهذا السبب تدرب الشركات موظفيها على كتابة رسائل مهنية تُظهر الاحترام والتفهم.",
+    "questions": [
+      {
+        "q": "Why do many customers prefer email?",
+        "options": [
+          "They can explain their problem clearly.",
+          "It is always faster than phone calls.",
+          "It has no written record.",
+          "It prevents all problems."
+        ],
+        "answer": 0,
+        "explain_ar": "يفضل العملاء البريد الإلكتروني لأنهم يستطيعون شرح مشكلتهم بوضوح وإرفاق ملفات عند الحاجة."
+      },
+      {
+        "q": "A good customer service email should be:",
+        "options": [
+          "short and angry",
+          "polite, clear, and helpful",
+          "confusing and informal",
+          "without greeting"
+        ],
+        "answer": 1,
+        "explain_ar": "رسائل خدمة العملاء الجيدة يجب أن تكون مهذبة وواضحة ومفيدة."
+      },
+      {
+        "q": "Why can email cause misunderstandings?",
+        "options": [
+          "Customers can see facial expressions.",
+          "Employees always write long emails.",
+          "Tone and facial expressions are missing.",
+          "Companies never use email."
+        ],
+        "answer": 2,
+        "explain_ar": "قد يحدث سوء فهم لأن العميل لا يسمع نبرة الصوت ولا يرى تعابير الوجه."
+      },
+      {
+        "q": "The word “professional” is closest in meaning to:",
+        "options": [
+          "careless",
+          "rude",
+          "suitable for work",
+          "personal only"
+        ],
+        "answer": 2,
+        "explain_ar": "كلمة professional تعني مهني أو مناسب لبيئة العمل."
+      }
+    ]
+  }
+];
+    let currentIndex = 0;
+    let currentTab = "passage";
+    let voices = [];
+
+    function byId(id) {
+      return document.getElementById(id);
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function renderButtons() {
+      const box = byId("modelButtons");
+      box.innerHTML = DATA.map((item, index) => `
+        <button class="model-btn ${index === currentIndex ? "active" : ""}" onclick="selectModel(${index})">
+          ${item.title_ar}
+          <span>${item.title_en}</span>
+        </button>
+      `).join("");
+    }
+
+    function selectModel(index) {
+      stopSpeech();
+      currentIndex = index;
+      renderApp();
+      showTab("passage");
+    }
+
+    function renderApp() {
+      const item = DATA[currentIndex];
+      renderButtons();
+      byId("currentTitleAr").textContent = item.title_ar;
+      byId("currentTitleEn").textContent = item.title_en;
+      byId("passageText").textContent = item.passage;
+      byId("translationText").textContent = item.translation;
+      renderQuestions();
+      updateScore(0, item.questions.length, false);
+    }
+
+    function renderQuestions() {
+      const item = DATA[currentIndex];
+      byId("questionsBox").innerHTML = item.questions.map((question, qIndex) => `
+        <div class="question" id="qCard-${qIndex}">
+          <h3>${qIndex + 1}. ${escapeHtml(question.q)}</h3>
+          ${question.options.map((option, oIndex) => `
+            <label class="option" id="option-${qIndex}-${oIndex}">
+              <input type="radio" name="q-${qIndex}" value="${oIndex}">
+              <span>${String.fromCharCode(65 + oIndex)}. ${escapeHtml(option)}</span>
+            </label>
+          `).join("")}
+          <div class="explain" id="explain-${qIndex}"></div>
+        </div>
+      `).join("");
+      byId("resultBox").style.display = "none";
+    }
+
+    function showTab(tab) {
+      currentTab = tab;
+      byId("passageTab").classList.toggle("hidden", tab !== "passage");
+      byId("translationTab").classList.toggle("hidden", tab !== "translation");
+      byId("questionsTab").classList.toggle("hidden", tab !== "questions");
+      document.querySelectorAll(".tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+    }
+
+    function getEnglishVoice() {
+      const voiceSelect = byId("voiceSelect");
+      const selectedName = voiceSelect.value;
+      if (selectedName) {
+        return voices.find(v => v.name === selectedName) || null;
+      }
+      return voices.find(v => /^en/i.test(v.lang) && /female|zira|samantha|google us english|microsoft/i.test(v.name))
+        || voices.find(v => /^en/i.test(v.lang))
+        || null;
+    }
+
+    function loadVoices() {
+      voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+      const voiceSelect = byId("voiceSelect");
+      const currentValue = voiceSelect.value;
+      const englishVoices = voices.filter(v => /^en/i.test(v.lang));
+      voiceSelect.innerHTML = `<option value="">الصوت الإنجليزي الافتراضي</option>` + englishVoices.map(v =>
+        `<option value="${escapeHtml(v.name)}">${escapeHtml(v.name)} - ${escapeHtml(v.lang)}</option>`
+      ).join("");
+      if (currentValue) voiceSelect.value = currentValue;
+    }
+
+    function speakText(text) {
+      if (!("speechSynthesis" in window)) {
+        alert("عذرًا، متصفحك لا يدعم القراءة الصوتية.");
+        return;
+      }
+      stopSpeech();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-US";
+      utterance.rate = parseFloat(byId("rateSelect").value || "0.9");
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      const voice = getEnglishVoice();
+      if (voice) utterance.voice = voice;
+      speechSynthesis.speak(utterance);
+    }
+
+    function speakPassage() {
+      speakText(DATA[currentIndex].passage);
+    }
+
+    function speakSelectedParagraph() {
+      const selected = window.getSelection().toString().trim();
+      if (selected) {
+        speakText(selected);
+      } else {
+        alert("حددي فقرة أو جملة من النص الإنجليزي أولًا، ثم اضغطي قراءة الفقرة المحددة.");
+      }
+    }
+
+    function pauseSpeech() {
+      if ("speechSynthesis" in window) speechSynthesis.pause();
+    }
+
+    function resumeSpeech() {
+      if ("speechSynthesis" in window) speechSynthesis.resume();
+    }
+
+    function stopSpeech() {
+      if ("speechSynthesis" in window) speechSynthesis.cancel();
+    }
+
+    function checkAnswers() {
+      const item = DATA[currentIndex];
+      let score = 0;
+      item.questions.forEach((question, qIndex) => {
+        const selected = document.querySelector(`input[name="q-${qIndex}"]:checked`);
+        const selectedValue = selected ? Number(selected.value) : -1;
+
+        question.options.forEach((_, oIndex) => {
+          const optionEl = byId(`option-${qIndex}-${oIndex}`);
+          optionEl.classList.remove("correct", "wrong");
+          if (oIndex === question.answer) optionEl.classList.add("correct");
+          if (selectedValue === oIndex && selectedValue !== question.answer) optionEl.classList.add("wrong");
+        });
+
+        if (selectedValue === question.answer) score++;
+        const explain = byId(`explain-${qIndex}`);
+        explain.style.display = "block";
+        explain.innerHTML = `<strong>التوضيح:</strong> ${escapeHtml(question.explain_ar)}`;
+      });
+
+      const percent = Math.round((score / item.questions.length) * 100);
+      updateScore(score, item.questions.length, true);
+      const message = percent >= 80
+        ? "رائع جدًا! مستوى ممتاز في فهم القطعة."
+        : percent >= 50
+          ? "جيد، راجعي الأخطاء ثم أعيدي المحاولة."
+          : "لا بأس، اقرئي القطعة مرة أخرى واستمعي للنص ثم أعيدي التدريب.";
+      const resultBox = byId("resultBox");
+      resultBox.style.display = "block";
+      resultBox.innerHTML = `نتيجتك: <strong>${score} / ${item.questions.length}</strong> — ${percent}%<br>${message}`;
+    }
+
+    function updateScore(score, total, show) {
+      const percent = show ? Math.round((score / total) * 100) : 0;
+      byId("scoreText").textContent = percent + "%";
+      byId("progressCircle").style.setProperty("--progress", `${Math.round(percent * 3.6)}deg`);
+    }
+
+    function resetAnswers() {
+      renderQuestions();
+      updateScore(0, DATA[currentIndex].questions.length, false);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderApp();
+      loadVoices();
+      if ("speechSynthesis" in window) {
+        speechSynthesis.onvoiceschanged = loadVoices;
+        setTimeout(loadVoices, 400);
+      }
+    });
+  </script>
+</body>
+</html>
